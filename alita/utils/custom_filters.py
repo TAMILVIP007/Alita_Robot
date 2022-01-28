@@ -49,8 +49,7 @@ def command(
             regex="|".join(flt.commands),
             bot_name=BOT_USERNAME,
         )
-        matches = search(compile_re(regex), text)
-        if matches:
+        if matches := search(compile_re(regex), text):
             m.command = [matches.group(2)]
             for arg in split(matches.group(4).strip()):
                 m.command.append(arg)

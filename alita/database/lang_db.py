@@ -35,11 +35,7 @@ class Langs:
 
     def get_chat_type(self, chat_id: int):
         _ = self
-        if str(chat_id).startswith("-100"):
-            chat_type = "supergroup"
-        else:
-            chat_type = "user"
-        return chat_type
+        return "supergroup" if str(chat_id).startswith("-100") else "user"
 
     def set_lang(self, chat_id: int, lang):
         with INSERTION_LOCK:
@@ -53,8 +49,7 @@ class Langs:
                 except Exception:
                     pass
 
-            curr = self.collection.find_one({"_id": chat_id})
-            if curr:
+            if curr := self.collection.find_one({"_id": chat_id}):
                 self.collection.update(
                     {"_id": chat_id},
                     {"lang": lang},
@@ -73,15 +68,12 @@ class Langs:
             chat_type = self.get_chat_type(chat_id)
 
             try:
-                lang_dict = LANG_DATA[chat_id]
-                if lang_dict:
-                    user_lang = lang_dict["lang"]
-                    return user_lang
+                if lang_dict := LANG_DATA[chat_id]:
+                    return lang_dict["lang"]
             except Exception:
                 pass
 
-            curr_lang = self.collection.find_one({"_id": chat_id})
-            if curr_lang:
+            if curr_lang := self.collection.find_one({"_id": chat_id}):
                 return curr_lang["lang"]
 
             LANG_DATA[chat_id] = {"chat_type": chat_type, "lang": "en"}
@@ -99,16 +91,14 @@ class Langs:
         with INSERTION_LOCK:
 
             try:
-                old_chat_local = self.get_grp(chat_id=old_chat_id)
-                if old_chat_local:
+                if old_chat_local := self.get_grp(chat_id=old_chat_id):
                     lang_dict = LANG_DATA[old_chat_id]
                     del LANG_DATA[old_chat_id]
                     LANG_DATA[new_chat_id] = lang_dict
             except KeyError:
                 pass
 
-            old_chat_db = self.collection.find_one({"_id": old_chat_id})
-            if old_chat_db:
+            if old_chat_db := self.collection.find_one({"_id": old_chat_id}):
                 new_data = old_chat_db.update({"_id": new_chat_id})
                 self.collection.delete_one({"_id": old_chat_id})
                 self.collection.insert_one(new_data)

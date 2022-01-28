@@ -25,8 +25,7 @@ mongodb_client = MongoClient(DB_URI)
 if mongodb_client:
     LOGGER.info("Established connection to MongoDB!")
 
-db = mongodb_client[DB_NAME]
-if db:
+if db := mongodb_client[DB_NAME]:
     LOGGER.info(f"Connected to '{DB_NAME}' database")
 
 
@@ -43,19 +42,13 @@ class MongoDB:
 
     # Find one entry from collection
     def find_one(self, query):
-        result = self.collection.find_one(query)
-        if result:
-            return result
-        return False
+        return result if (result := self.collection.find_one(query)) else False
 
     # Find entries from collection
     def find_all(self, query=None):
         if query is None:
             query = {}
-        lst = []
-        for document in self.collection.find(query):
-            lst.append(document)
-        return lst
+        return list(self.collection.find(query))
 
     # Count entries from collection
     def count(self, query=None):
@@ -66,8 +59,7 @@ class MongoDB:
     # Delete entry/entries from collection
     def delete_one(self, query):
         self.collection.delete_many(query)
-        after_delete = self.collection.count_documents({})
-        return after_delete
+        return self.collection.count_documents({})
 
     # Replace one entry in collection
     def replace(self, query, new_data):

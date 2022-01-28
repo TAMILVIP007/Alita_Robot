@@ -31,14 +31,16 @@ from alita.utils.custom_filters import command
 
 
 async def gen_formatting_kb(m):
-    keyboard = InlineKeyboardMarkup(
+    return InlineKeyboardMarkup(
         [
             [
                 InlineKeyboardButton(
                     "Markdown Formatting",
                     callback_data="formatting.md_formatting",
                 ),
-                InlineKeyboardButton("Fillings", callback_data="formatting.fillings"),
+                InlineKeyboardButton(
+                    "Fillings", callback_data="formatting.fillings"
+                ),
             ],
             [
                 InlineKeyboardButton(
@@ -54,7 +56,6 @@ async def gen_formatting_kb(m):
             ],
         ],
     )
-    return keyboard
 
 
 @Alita.on_message(

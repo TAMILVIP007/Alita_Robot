@@ -67,11 +67,9 @@ class Filters:
                 )
                 FILTER_CACHE[chat_id] = curr_filters
 
-            # Database update
-            curr = self.collection.find_one(
+            if curr := self.collection.find_one(
                 {"chat_id": chat_id, "keyword": keyword},
-            )
-            if curr:
+            ):
                 return False
             return self.collection.insert_one(
                 {
@@ -86,12 +84,11 @@ class Filters:
     def get_filter(self, chat_id: int, keyword: str):
         with INSERTION_LOCK:
             try:
-                curr = next(
+                if curr := next(
                     i
                     for i in FILTER_CACHE[chat_id]
                     if keyword in i["keyword"].split("|")
-                )
-                if curr:
+                ):
                     return curr
             except (KeyError, StopIteration):
                 pass
@@ -99,10 +96,9 @@ class Filters:
                 LOGGER.error(ef)
                 LOGGER.error(format_exc())
 
-            curr = self.collection.find_one(
+            if curr := self.collection.find_one(
                 {"chat_id": chat_id, "keyword": {"$regex": fr"\|?{keyword}\|?"}},
-            )
-            if curr:
+            ):
                 return curr
 
             return "Filter does not exist!"
@@ -117,8 +113,7 @@ class Filters:
                 LOGGER.error(ef)
                 LOGGER.error(format_exc())
 
-            curr = self.collection.find_all({"chat_id": chat_id})
-            if curr:
+            if curr := self.collection.find_all({"chat_id": chat_id}):
                 filter_list = {i["keyword"] for i in curr}
                 return list(filter_list)
             return []
@@ -140,10 +135,9 @@ class Filters:
                 LOGGER.error(ef)
                 LOGGER.error(format_exc())
 
-            curr = self.collection.find_one(
+            if curr := self.collection.find_one(
                 {"chat_id": chat_id, "keyword": {"$regex": fr"\|?{keyword}\|?"}},
-            )
-            if curr:
+            ):
                 self.collection.delete_one(curr)
                 return True
 
@@ -181,8 +175,7 @@ class Filters:
                 LOGGER.error(ef)
                 LOGGER.error(format_exc())
 
-            curr = self.collection.find_all()
-            if curr:
+            if curr := self.collection.find_all():
                 return len(curr)
             return 0
 
@@ -210,8 +203,7 @@ class Filters:
                 LOGGER.error(ef)
                 LOGGER.error(format_exc())
 
-            curr = self.collection.find_all()
-            if curr:
+            if curr := self.collection.find_all():
                 return len(
                     [z for z in (i["keyword"].split("|") for i in curr) if len(z) >= 2],
                 )
@@ -263,9 +255,7 @@ class Filters:
             except KeyError:
                 pass
 
-            # Update in db
-            old_chat_db = self.collection.find_one({"_id": old_chat_id})
-            if old_chat_db:
+            if old_chat_db := self.collection.find_one({"_id": old_chat_id}):
                 new_data = old_chat_db.update({"_id": new_chat_id})
                 self.collection.delete_one({"_id": old_chat_id})
                 self.collection.insert_one(new_data)

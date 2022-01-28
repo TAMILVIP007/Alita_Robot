@@ -42,8 +42,7 @@ class Pins:
             if chat_id in (PINS_CACHE[atype]):
                 return True
 
-            curr = self.collection.find_one({"_id": chat_id, atype: True})
-            if curr:
+            if curr := self.collection.find_one({"_id": chat_id, atype: True}):
                 return True
 
             return False
@@ -61,9 +60,9 @@ class Pins:
     def set_on(self, chat_id: int, atype: str):
         global PINS_CACHE
         with INSERTION_LOCK:
-            otype = "cleanlinked" if atype == "antichannelpin" else "antichannelpin"
             if chat_id not in (PINS_CACHE[atype]):
                 (PINS_CACHE[atype]).add(chat_id)
+                otype = "cleanlinked" if atype == "antichannelpin" else "antichannelpin"
                 try:
                     return self.collection.insert_one(
                         {"_id": chat_id, atype: True, otype: False},
@@ -120,8 +119,7 @@ class Pins:
                 (PINS_CACHE["cleanlinked"]).remove(old_chat_id)
                 (PINS_CACHE["cleanlinked"]).add(new_chat_id)
 
-            old_chat_db = self.collection.find_one({"_id": old_chat_id})
-            if old_chat_db:
+            if old_chat_db := self.collection.find_one({"_id": old_chat_id}):
                 new_data = old_chat_db.update({"_id": new_chat_id})
                 self.collection.delete_one({"_id": old_chat_id})
                 self.collection.insert_one(new_data)

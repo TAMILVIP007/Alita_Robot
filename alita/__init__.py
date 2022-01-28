@@ -136,28 +136,7 @@ async def load_cmds(all_plugins):
 
         plugin_name = imported_module.__PLUGIN__.lower()
 
-        if plugin_name not in HELP_COMMANDS:
-            HELP_COMMANDS[plugin_name] = {
-                "help_msg": "",
-                "buttons": [],
-                "alt_cmds": [],
-            }
-            if hasattr(imported_module, "__help__"):
-                HELP_COMMANDS[plugin_name]["help_msg"] = imported_module.__help__
-            if hasattr(imported_module, "__buttons__"):
-                HELP_COMMANDS[plugin_name]["buttons"] = imported_module.__buttons__
-            if hasattr(imported_module, "__alt_name__"):
-                HELP_COMMANDS[plugin_name]["alt_cmds"] = imported_module.__alt_name__
-
-            try:
-                # Add the plugin name to cmd list
-                (HELP_COMMANDS[plugin_name]["alt_cmds"]).append(
-                    plugin_name.split(".")[1],
-                )
-            except IndexError:
-                LOGGER.error(f"Not loading plugin '{plugin_name}' due to invalid name!")
-                continue
-        else:
+        if plugin_name in HELP_COMMANDS:
             raise Exception(
                 (
                     "Can't have two plugins with the same name! Please change one\n"
@@ -165,6 +144,26 @@ async def load_cmds(all_plugins):
                 ),
             )
 
+        HELP_COMMANDS[plugin_name] = {
+            "help_msg": "",
+            "buttons": [],
+            "alt_cmds": [],
+        }
+        if hasattr(imported_module, "__help__"):
+            HELP_COMMANDS[plugin_name]["help_msg"] = imported_module.__help__
+        if hasattr(imported_module, "__buttons__"):
+            HELP_COMMANDS[plugin_name]["buttons"] = imported_module.__buttons__
+        if hasattr(imported_module, "__alt_name__"):
+            HELP_COMMANDS[plugin_name]["alt_cmds"] = imported_module.__alt_name__
+
+        try:
+            # Add the plugin name to cmd list
+            (HELP_COMMANDS[plugin_name]["alt_cmds"]).append(
+                plugin_name.split(".")[1],
+            )
+        except IndexError:
+            LOGGER.error(f"Not loading plugin '{plugin_name}' due to invalid name!")
+            continue
     if NO_LOAD:
         LOGGER.warning(f"Not loading Plugins - {NO_LOAD}")
 

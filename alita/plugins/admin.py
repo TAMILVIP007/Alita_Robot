@@ -99,12 +99,13 @@ async def adminlist_show(_, m: Message):
 async def reload_admins(_, m: Message):
     global TEMP_ADMIN_CACHE_BLOCK
 
-    if (m.chat.id in set(TEMP_ADMIN_CACHE_BLOCK.keys())) and (
-        m.from_user.id not in SUPPORT_STAFF
+    if (
+        (m.chat.id in set(TEMP_ADMIN_CACHE_BLOCK.keys()))
+        and (m.from_user.id not in SUPPORT_STAFF)
+        and TEMP_ADMIN_CACHE_BLOCK[m.chat.id] == "manualblock"
     ):
-        if TEMP_ADMIN_CACHE_BLOCK[m.chat.id] == "manualblock":
-            await m.reply_text("Can only reload admin cache once per 10 mins!")
-            return
+        await m.reply_text("Can only reload admin cache once per 10 mins!")
+        return
 
     try:
         await admin_cache_reload(m, "admincache")
@@ -186,7 +187,7 @@ async def promote_usr(c: Alita, m: Message):
 
         # ----- Add admin to temp cache -----
         try:
-            inp1 = user_name if user_name else user_first_name
+            inp1 = user_name or user_first_name
             admins_group = ADMIN_CACHE[m.chat.id]
             admins_group.append((user_id, inp1))
             ADMIN_CACHE[m.chat.id] = admins_group

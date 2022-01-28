@@ -36,8 +36,7 @@ class AntiFlood:
     def set_status(self, chat_id: int, status: bool = False):
         with INSERTION_LOCK:
 
-            chat_dict = self.get_grp(chat_id)
-            if chat_dict:
+            if chat_dict := self.get_grp(chat_id):
                 return self.collection.update(
                     {"_id": chat_id},
                     {"status": status},
@@ -47,16 +46,12 @@ class AntiFlood:
 
     def get_status(self, chat_id: int):
         with INSERTION_LOCK:
-            z = self.get_grp(chat_id)
-            if z:
-                return z["status"]
-            return False
+            return z["status"] if (z := self.get_grp(chat_id)) else False
 
     def set_antiflood(self, chat_id: int, max_msg: int):
         with INSERTION_LOCK:
 
-            chat_dict = self.get_grp(chat_id)
-            if chat_dict:
+            if chat_dict := self.get_grp(chat_id):
                 return self.collection.update(
                     {"_id": chat_id},
                     {"max_msg": max_msg},
@@ -66,10 +61,7 @@ class AntiFlood:
 
     def get_antiflood(self, chat_id: int):
         with INSERTION_LOCK:
-            z = self.get_grp(chat_id)
-            if z:
-                return z["max_msg"]
-            return 0
+            return z["max_msg"] if (z := self.get_grp(chat_id)) else 0
 
     def set_action(self, chat_id: int, action: str = "mute"):
         with INSERTION_LOCK:
@@ -77,9 +69,7 @@ class AntiFlood:
             if action not in ("kick", "ban", "mute"):
                 action = "mute"  # Default action
 
-            chat_dict = self.get_grp(chat_id)
-            if chat_dict:
-
+            if chat_dict := self.get_grp(chat_id):
                 return self.collection.update(
                     {"_id": chat_id},
                     {"action": action},
@@ -90,8 +80,7 @@ class AntiFlood:
     def get_action(self, chat_id: int):
         with INSERTION_LOCK:
 
-            z = self.get_grp(chat_id)
-            if z:
+            if z := self.get_grp(chat_id):
                 return z["action"]
         return "none"
 
@@ -105,8 +94,7 @@ class AntiFlood:
     def migrate_chat(self, old_chat_id: int, new_chat_id: int):
         with INSERTION_LOCK:
 
-            old_chat_db = self.collection.find_one({"_id": old_chat_id})
-            if old_chat_db:
+            if old_chat_db := self.collection.find_one({"_id": old_chat_id}):
                 new_data = old_chat_db.update({"_id": new_chat_id})
                 self.collection.delete_one({"_id": old_chat_id})
                 self.collection.insert_one(new_data)

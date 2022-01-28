@@ -57,11 +57,8 @@ class GroupBlacklist:
                 BLACKLIST_CHATS.sort()
                 return BLACKLIST_CHATS
             except Exception:
-                bl_chats = []
                 all_chats = self.collection.find_all()
-                for chat in all_chats:
-                    bl_chats.append(chat["_id"])
-                return bl_chats
+                return [chat["_id"] for chat in all_chats]
 
     def get_from_db(self):
         return self.collection.find_all()

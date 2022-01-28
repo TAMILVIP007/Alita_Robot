@@ -47,8 +47,7 @@ class Users:
             except KeyError:
                 pass
 
-            curr = self.collection.find_one({"_id": user_id})
-            if curr:
+            if curr := self.collection.find_one({"_id": user_id}):
                 if (name == curr["name"]) and (username == curr["username"]):
                     # Prevent additional queries
                     return
@@ -68,8 +67,7 @@ class Users:
             if user_id in set(USERS_CACHE.keys()):
                 del USERS_CACHE[user_id]
 
-            curr = self.collection.find_one({"_id": user_id})
-            if curr:
+            if curr := self.collection.find_one({"_id": user_id}):
                 return self.collection.delete_one(
                     {"_id": user_id},
                 )

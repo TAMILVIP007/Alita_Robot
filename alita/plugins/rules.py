@@ -47,9 +47,7 @@ async def get_rules(_, m: Message):
         )
         return
 
-    priv_rules_status = db.get_privrules(m.chat.id)
-
-    if priv_rules_status:
+    if priv_rules_status := db.get_privrules(m.chat.id):
         from alita import BOT_USERNAME
 
         pm_kb = InlineKeyboardMarkup(
@@ -89,7 +87,7 @@ async def set_rules(_, m: Message):
         rules = m.text.split(None, 1)[1]
 
     if len(rules) > 4000:
-        rules = rules[0:3949]  # Split Rules if len > 4000 chars
+        rules = rules[:3949]
         await m.reply_text("Rules truncated to 3950 characters!")
 
     db.set_rules(chat_id, rules)
@@ -139,19 +137,19 @@ async def clear_rules(_, m: Message):
         return
 
     await m.reply_text(
-        (tlang(m, "rules.clear_rules")),
+        tlang(m, "rules.clear_rules"),
         reply_markup=InlineKeyboardMarkup(
             [
                 [
                     InlineKeyboardButton(
-                        "⚠️ Confirm",
-                        callback_data=f"clear_rules",
+                        "⚠️ Confirm", callback_data='clear_rules'
                     ),
                     InlineKeyboardButton("❌ Cancel", callback_data="close"),
-                ],
-            ],
+                ]
+            ]
         ),
     )
+
     return
 
 

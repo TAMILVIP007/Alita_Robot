@@ -197,10 +197,9 @@ async def split_quotes(text: str):
 
 async def remove_escapes(text: str) -> str:
     """Remove the escaped from message."""
-    counter = 0
     res = ""
     is_escaped = False
-    while counter < len(text):
+    for counter in range(len(text)):
         if is_escaped:
             res += text[counter]
             is_escaped = False
@@ -208,5 +207,4 @@ async def remove_escapes(text: str) -> str:
             is_escaped = True
         else:
             res += text[counter]
-        counter += 1
     return res

@@ -41,8 +41,7 @@ class Rules:
             if (chat_id in set(RULES_CACHE.keys())) and (RULES_CACHE[chat_id]["rules"]):
                 return RULES_CACHE[chat_id]["rules"]
 
-            rules = self.collection.find_one({"_id": chat_id})
-            if rules:
+            if rules := self.collection.find_one({"_id": chat_id}):
                 return rules["rules"]
             return None
 
@@ -53,8 +52,7 @@ class Rules:
             if chat_id in set(RULES_CACHE.keys()):
                 RULES_CACHE[chat_id]["rules"] = rules
 
-            curr_rules = self.collection.find_one({"_id": chat_id})
-            if curr_rules:
+            if curr_rules := self.collection.find_one({"_id": chat_id}):
                 return self.collection.update(
                     {"_id": chat_id},
                     {"rules": rules},
@@ -74,8 +72,7 @@ class Rules:
             ):
                 return RULES_CACHE[chat_id]["privrules"]
 
-            curr_rules = self.collection.find_one({"_id": chat_id})
-            if curr_rules:
+            if curr_rules := self.collection.find_one({"_id": chat_id}):
                 return curr_rules["privrules"]
 
             RULES_CACHE[chat_id] = {"privrules": False, "rules": ""}
@@ -90,8 +87,7 @@ class Rules:
             if chat_id in set(RULES_CACHE.keys()):
                 RULES_CACHE[chat_id]["privrules"] = privrules
 
-            curr_rules = self.collection.find_one({"_id": chat_id})
-            if curr_rules:
+            if curr_rules := self.collection.find_one({"_id": chat_id}):
                 return self.collection.update(
                     {"_id": chat_id},
                     {"privrules": privrules},
@@ -109,8 +105,7 @@ class Rules:
             if chat_id in set(RULES_CACHE.keys()):
                 del RULES_CACHE[chat_id]
 
-            curr_rules = self.collection.find_one({"_id": chat_id})
-            if curr_rules:
+            if curr_rules := self.collection.find_one({"_id": chat_id}):
                 return self.collection.delete_one({"_id": chat_id})
             return "Rules not found!"
 
@@ -157,9 +152,7 @@ class Rules:
             except KeyError:
                 pass
 
-            # Update in db
-            old_chat_db = self.collection.find_one({"_id": old_chat_id})
-            if old_chat_db:
+            if old_chat_db := self.collection.find_one({"_id": old_chat_id}):
                 new_data = old_chat_db.update({"_id": new_chat_id})
                 self.collection.delete_one({"_id": old_chat_id})
                 self.collection.insert_one(new_data)

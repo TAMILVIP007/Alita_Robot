@@ -101,8 +101,7 @@ async def get_lyrics(_, m: Message):
     em = await m.reply_text(
         (tlang(m, "utils.song.searching").format(song_name=query)),
     )
-    song = Song.find_song(query)
-    if song:
+    if song := Song.find_song(query):
         if song.lyrics:
             reply = song.format()
         else:
@@ -160,19 +159,18 @@ async def id_info(c: Alita, m: Message):
                 f"{(await mention_html(user.first_name, user.id))}'s ID is <code>{user.id}</code>.",
                 parse_mode="HTML",
             )
+    elif m.chat.type == "private":
+        await m.reply_text(
+            (tlang(m, "utils.id.my_id")).format(
+                my_id=f"<code>{m.chat.id}</code>",
+            ),
+        )
     else:
-        if m.chat.type == "private":
-            await m.reply_text(
-                (tlang(m, "utils.id.my_id")).format(
-                    my_id=f"<code>{m.chat.id}</code>",
-                ),
-            )
-        else:
-            await m.reply_text(
-                (tlang(m, "utils.id.group_id")).format(
-                    group_id=f"<code>{m.chat.id}</code>",
-                ),
-            )
+        await m.reply_text(
+            (tlang(m, "utils.id.group_id")).format(
+                group_id=f"<code>{m.chat.id}</code>",
+            ),
+        )
     return
 
 
@@ -385,15 +383,12 @@ async def translate(_, m: Message):
             )
             return
         target_lang = m.text.split()[1]
-        if m.reply_to_message.text:
-            text = m.reply_to_message.text
-        else:
-            text = m.reply_to_message.caption
+        text = m.reply_to_message.text or m.reply_to_message.caption
         detectlang = await trl.detect(text)
         try:
             tekstr = await trl(text, targetlang=target_lang)
         except ValueError as err:
-            await m.reply_text(f"Error: <code>{str(err)}</code>")
+            await m.reply_text(f'Error: <code>{err}</code>')
             return
     else:
         if len(m.text.split()) <= 2:

@@ -69,7 +69,7 @@ async def view_blacklist(_, m: Message):
 @Alita.on_message(command("addblacklist") & restrict_filter)
 async def add_blacklist(_, m: Message):
 
-    if not len(m.text.split()) >= 2:
+    if len(m.text.split()) < 2:
         await m.reply_text(tlang(m, "general.check_help"))
         return
 
@@ -123,7 +123,7 @@ async def blacklistreason(_, m: Message):
 )
 async def rm_blacklist(_, m: Message):
 
-    if not len(m.text.split()) >= 2:
+    if len(m.text.split()) < 2:
         await m.reply_text(tlang(m, "general.check_help"))
         return
 

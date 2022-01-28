@@ -58,9 +58,7 @@ class Chats:
             except KeyError:
                 pass
 
-            # Databse Cache
-            curr = self.collection.find_one({"_id": chat_id})
-            if curr:
+            if curr := self.collection.find_one({"_id": chat_id}):
                 users_old = curr["users"]
                 users_old.append(user_id)
                 users = list(set(users_old))
@@ -92,8 +90,7 @@ class Chats:
             except Exception as ef:
                 LOGGER.error(ef)
                 LOGGER.error(format_exc())
-                curr = self.collection.find_one({"_id": chat_id})
-                if curr:
+                if curr := self.collection.find_one({"_id": chat_id}):
                     return len(curr["users"])
             return 0
 
@@ -104,8 +101,7 @@ class Chats:
             except Exception as ef:
                 LOGGER.error(ef)
                 LOGGER.error(format_exc())
-                curr = self.collection.find_one({"_id": chat_id})
-                if curr:
+                if curr := self.collection.find_one({"_id": chat_id}):
                     return curr["users"]
             return []
 
@@ -164,9 +160,7 @@ class Chats:
             except KeyError:
                 pass
 
-            # Update in db
-            old_chat_db = self.collection.find_one({"_id": old_chat_id})
-            if old_chat_db:
+            if old_chat_db := self.collection.find_one({"_id": old_chat_id}):
                 new_data = old_chat_db.update({"_id": new_chat_id})
                 self.collection.delete_one({"_id": old_chat_id})
                 self.collection.insert_one(new_data)

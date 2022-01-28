@@ -51,15 +51,14 @@ async def gen_cmds_kb(m: Message or CallbackQuery):
     kb = []
 
     while cmds:
-        if cmds:
-            cmd = cmds[0]
-            a = [
-                InlineKeyboardButton(
-                    tlang(m, cmd),
-                    callback_data=f"get_mod.{cmd.lower()}",
-                ),
-            ]
-            cmds.pop(0)
+        cmd = cmds[0]
+        a = [
+            InlineKeyboardButton(
+                tlang(m, cmd),
+                callback_data=f"get_mod.{cmd.lower()}",
+            ),
+        ]
+        cmds.pop(0)
         if cmds:
             cmd = cmds[0]
             a.append(
@@ -87,7 +86,7 @@ async def gen_start_kb(q: Message or CallbackQuery):
 
     from alita import BOT_USERNAME
 
-    keyboard = InlineKeyboardMarkup(
+    return InlineKeyboardMarkup(
         [
             [
                 InlineKeyboardButton(
@@ -117,7 +116,6 @@ async def gen_start_kb(q: Message or CallbackQuery):
             ],
         ],
     )
-    return keyboard
 
 
 async def get_private_note(c: Alita, m: Message, help_option: str):
@@ -125,9 +123,9 @@ async def get_private_note(c: Alita, m: Message, help_option: str):
     from alita import BOT_USERNAME
 
     help_lst = help_option.split("_")
-    chat_id = int(help_lst[1])
-
     if len(help_lst) == 2:
+        chat_id = int(help_lst[1])
+
         all_notes = notes_db.get_all_notes(chat_id)
         chat_title = chats_db.get_chat_info(chat_id)["chat_name"]
         rply = f"Notes in {chat_title}:\n\n"
@@ -139,12 +137,11 @@ async def get_private_note(c: Alita, m: Message, help_option: str):
         await m.reply_text(rply, disable_web_page_preview=True, quote=True)
         return
 
-    if len(help_lst) == 3:
-        note_hash = help_option.split("_")[2]
-        getnotes = notes_db.get_note_by_hash(note_hash)
-    else:
+    if len(help_lst) != 3:
         return
 
+    note_hash = help_option.split("_")[2]
+    getnotes = notes_db.get_note_by_hash(note_hash)
     if not getnotes:
         await m.reply_text("Note does not exist", quote=True)
         return

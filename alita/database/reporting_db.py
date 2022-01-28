@@ -35,11 +35,7 @@ class Reporting:
 
     def get_chat_type(self, chat_id: int):
         _ = self
-        if str(chat_id).startswith("-100"):
-            chat_type = "supergroup"
-        else:
-            chat_type = "user"
-        return chat_type
+        return "supergroup" if str(chat_id).startswith("-100") else "user"
 
     def set_settings(self, chat_id: int, status: bool = True):
         global REPORTING_CACHE
@@ -49,8 +45,7 @@ class Reporting:
             if chat_id in set(REPORTING_CACHE.keys()):
                 REPORTING_CACHE[chat_id]["status"] = status
 
-            curr_settings = self.collection.find_one({"_id": chat_id})
-            if curr_settings:
+            if curr_settings := self.collection.find_one({"_id": chat_id}):
                 return self.collection.update(
                     {"_id": chat_id},
                     {"status": status},
@@ -74,8 +69,7 @@ class Reporting:
             ):
                 return REPORTING_CACHE[chat_id]["status"]
 
-            curr_settings = self.collection.find_one({"_id": chat_id})
-            if curr_settings:
+            if curr_settings := self.collection.find_one({"_id": chat_id}):
                 return curr_settings["status"]
 
             REPORTING_CACHE[chat_id] = {
@@ -102,9 +96,7 @@ class Reporting:
             except KeyError:
                 pass
 
-            # Update in db
-            old_chat_db = self.collection.find_one({"_id": old_chat_id})
-            if old_chat_db:
+            if old_chat_db := self.collection.find_one({"_id": old_chat_id}):
                 new_data = old_chat_db.update({"_id": new_chat_id})
                 self.collection.delete_one({"_id": old_chat_id})
                 self.collection.insert_one(new_data)

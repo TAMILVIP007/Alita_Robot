@@ -39,10 +39,9 @@ class Notes:
         fileid="",
     ):
         with INSERTION_LOCK:
-            curr = self.collection.find_one(
+            if curr := self.collection.find_one(
                 {"chat_id": chat_id, "note_name": note_name},
-            )
-            if curr:
+            ):
                 return False
             hash_gen = md5(
                 (note_name + note_value + str(chat_id) + str(int(time()))).encode(),
@@ -60,10 +59,9 @@ class Notes:
 
     def get_note(self, chat_id: int, note_name: str):
         with INSERTION_LOCK:
-            curr = self.collection.find_one(
+            if curr := self.collection.find_one(
                 {"chat_id": chat_id, "note_name": note_name},
-            )
-            if curr:
+            ):
                 return curr
             return "Note does not exist!"
 
@@ -73,18 +71,15 @@ class Notes:
     def get_all_notes(self, chat_id: int):
         with INSERTION_LOCK:
             curr = self.collection.find_all({"chat_id": chat_id})
-            note_list = []
-            for note in curr:
-                note_list.append((note["note_name"], note["hash"]))
+            note_list = [(note["note_name"], note["hash"]) for note in curr]
             note_list.sort()
             return note_list
 
     def rm_note(self, chat_id: int, note_name: str):
         with INSERTION_LOCK:
-            curr = self.collection.find_one(
+            if curr := self.collection.find_one(
                 {"chat_id": chat_id, "note_name": note_name},
-            )
-            if curr:
+            ):
                 self.collection.delete_one(curr)
                 return True
             return False
@@ -95,17 +90,14 @@ class Notes:
 
     def count_notes(self, chat_id: int):
         with INSERTION_LOCK:
-            curr = self.collection.find_all({"chat_id": chat_id})
-            if curr:
+            if curr := self.collection.find_all({"chat_id": chat_id}):
                 return len(curr)
             return 0
 
     def count_notes_chats(self):
         with INSERTION_LOCK:
             notes = self.collection.find_all()
-            chats_ids = []
-            for chat in notes:
-                chats_ids.append(chat["chat_id"])
+            chats_ids = [chat["chat_id"] for chat in notes]
             return len(set(chats_ids))
 
     def count_all_notes(self):
@@ -120,8 +112,7 @@ class Notes:
     def migrate_chat(self, old_chat_id: int, new_chat_id: int):
         with INSERTION_LOCK:
 
-            old_chat_db = self.collection.find_one({"_id": old_chat_id})
-            if old_chat_db:
+            if old_chat_db := self.collection.find_one({"_id": old_chat_id}):
                 new_data = old_chat_db.update({"_id": new_chat_id})
                 self.collection.delete_one({"_id": old_chat_id})
                 self.collection.insert_one(new_data)
@@ -132,14 +123,12 @@ class NotesSettings:
         self.collection = MongoDB("notes_settings")
 
     def set_privatenotes(self, chat_id: int, status: bool = False):
-        curr = self.collection.find_one({"_id": chat_id})
-        if curr:
+        if curr := self.collection.find_one({"_id": chat_id}):
             return self.collection.update({"_id": chat_id}, {"privatenotes": status})
         return self.collection.insert_one({"_id": chat_id, "privatenotes": status})
 
     def get_privatenotes(self, chat_id: int):
-        curr = self.collection.find_one({"_id": chat_id})
-        if curr:
+        if curr := self.collection.find_one({"_id": chat_id}):
             return curr["privatenotes"]
         self.collection.update({"_id": chat_id}, {"privatenotes": False})
         return False
@@ -154,8 +143,7 @@ class NotesSettings:
     def migrate_chat(self, old_chat_id: int, new_chat_id: int):
         with INSERTION_LOCK:
 
-            old_chat_db = self.collection.find_one({"_id": old_chat_id})
-            if old_chat_db:
+            if old_chat_db := self.collection.find_one({"_id": old_chat_id}):
                 new_data = old_chat_db.update({"_id": new_chat_id})
                 self.collection.delete_one({"_id": old_chat_id})
                 self.collection.insert_one(new_data)

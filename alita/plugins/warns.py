@@ -55,14 +55,11 @@ async def warn(c: Alita, m: Message):
         r_id = m.reply_to_message.message_id
         if len(m.text.split()) >= 2:
             reason = m.text.split(None, 1)[1]
-    elif not m.reply_to_message:
+    else:
         r_id = m.message_id
         if len(m.text.split()) >= 3:
             reason = m.text.split(None, 2)[2]
-    else:
-        reason = None
-
-    if not len(m.command) > 1 and not m.reply_to_message:
+    if len(m.command) <= 1 and not m.reply_to_message:
         await m.reply_text("I can't warn nothing! Tell me user whom I should warn")
         return
 
@@ -112,8 +109,7 @@ async def warn(c: Alita, m: Message):
         )
         await m.stop_propagation()
 
-    rules = rules_db.get_rules(m.chat.id)
-    if rules:
+    if rules := rules_db.get_rules(m.chat.id):
         kb = InlineKeyboardButton(
             "Rules 📋",
             url=f"https://t.me/{BOT_USERNAME}?start=rules_{m.chat.id}",
@@ -156,7 +152,7 @@ async def warn(c: Alita, m: Message):
 async def reset_warn(c: Alita, m: Message):
     from alita import BOT_ID
 
-    if not len(m.command) > 1 and not m.reply_to_message:
+    if len(m.command) <= 1 and not m.reply_to_message:
         await m.reply_text("I can't warn nothing! Tell me user whom I should warn")
         return
 
@@ -235,7 +231,7 @@ async def list_warns(c: Alita, m: Message):
 async def remove_warn(c: Alita, m: Message):
     from alita import BOT_ID
 
-    if not len(m.command) > 1 and not m.reply_to_message:
+    if len(m.command) <= 1 and not m.reply_to_message:
         await m.reply_text(
             "I can't remove warns of nothing! Tell me user whose warn should be removed!",
         )

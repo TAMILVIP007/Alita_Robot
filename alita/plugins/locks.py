@@ -69,7 +69,7 @@ async def lock_perm(c: Alita, m: Message):
     pin = ""
     perm = ""
 
-    if not len(m.text.split()) >= 2:
+    if len(m.text.split()) < 2:
         await m.reply_text("Please enter a permission to lock!")
         return
     lock_type = m.text.split(None, 1)[1]
@@ -200,9 +200,7 @@ async def view_locks(_, m: Message):
     v_perm = m.chat.permissions
 
     async def convert_to_emoji(val: bool):
-        if val is True:
-            return "✅"
-        return "❌"
+        return "✅" if val else "❌"
 
     vmsg = await convert_to_emoji(v_perm.can_send_messages)
     vmedia = await convert_to_emoji(v_perm.can_send_media_messages)
@@ -259,7 +257,7 @@ async def unlock_perm(c: Alita, m: Message):
         uperm,
     ) = ("", "", "", "", "", "", "", "", "", "", "", "")
 
-    if not len(m.text.split()) >= 2:
+    if len(m.text.split()) < 2:
         await m.reply_text("Please enter a permission to unlock!")
         return
     unlock_type = m.text.split(None, 1)[1]
@@ -386,9 +384,7 @@ async def unlock_perm(c: Alita, m: Message):
 
 async def prevent_approved(m: Message):
     approved_users = app_db.list_approved(m.chat.id)
-    ul = []
-    for user in approved_users:
-        ul.append(user["user_id"])
+    ul = [user["user_id"] for user in approved_users]
     for i in ul:
         await m.chat.restrict_member(
             user_id=i,

@@ -41,7 +41,7 @@ async def botstaff(c: Alita, m: Message):
         pass
     true_dev = list(set(DEV_USERS) - {OWNER_ID})
     reply += "\n<b>Developers ⚡️:</b>\n"
-    if true_dev == []:
+    if not true_dev:
         reply += "No Dev Users\n"
     else:
         for each_user in true_dev:
@@ -53,7 +53,7 @@ async def botstaff(c: Alita, m: Message):
                 pass
     true_sudo = list(set(SUDO_USERS) - set(DEV_USERS))
     reply += "\n<b>Sudo Users 🐉:</b>\n"
-    if true_sudo == []:
+    if not true_sudo:
         reply += "No Sudo Users\n"
     else:
         for each_user in true_sudo:

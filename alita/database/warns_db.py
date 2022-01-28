@@ -31,8 +31,9 @@ class Warns:
 
     def warn_user(self, chat_id: int, user_id: int, warn_reason=None):
         with INSERTION_LOCK:
-            curr = self.collection.find_one({"chat_id": chat_id, "user_id": user_id})
-            if curr:
+            if curr := self.collection.find_one(
+                {"chat_id": chat_id, "user_id": user_id}
+            ):
                 curr_warns = curr["warns"] + [warn_reason]
                 num_warns = len(curr_warns)
                 self.collection.update(
@@ -55,8 +56,9 @@ class Warns:
     def remove_warn(self, chat_id: int, user_id: int):
         with INSERTION_LOCK:
 
-            curr = self.collection.find_one({"chat_id": chat_id, "user_id": user_id})
-            if curr:
+            if curr := self.collection.find_one(
+                {"chat_id": chat_id, "user_id": user_id}
+            ):
                 curr_warns = curr["warns"][:-1]
                 num_warns = len(curr_warns)
                 self.collection.update(
@@ -69,8 +71,9 @@ class Warns:
 
     def reset_warns(self, chat_id: int, user_id: int):
         with INSERTION_LOCK:
-            curr = self.collection.find_one({"chat_id": chat_id, "user_id": user_id})
-            if curr:
+            if curr := self.collection.find_one(
+                {"chat_id": chat_id, "user_id": user_id}
+            ):
                 return self.collection.delete_one(
                     {"chat_id": chat_id, "user_id": user_id},
                 )
@@ -78,8 +81,9 @@ class Warns:
 
     def get_warns(self, chat_id: int, user_id: int):
         with INSERTION_LOCK:
-            curr = self.collection.find_one({"chat_id": chat_id, "user_id": user_id})
-            if curr:
+            if curr := self.collection.find_one(
+                {"chat_id": chat_id, "user_id": user_id}
+            ):
                 return curr["warns"], len(curr["warns"])
             return [], 0
 
@@ -108,8 +112,7 @@ class WarnSettings:
 
     def set_warnmode(self, chat_id: int, warn_mode: str = "kick"):
         with INSERTION_LOCK:
-            curr = self.collection.find_one({"_id": chat_id})
-            if curr:
+            if curr := self.collection.find_one({"_id": chat_id}):
                 self.collection.update(
                     {"_id": chat_id},
                     {"warn_mode": warn_mode},
@@ -124,8 +127,7 @@ class WarnSettings:
 
     def get_warnmode(self, chat_id: int):
         with INSERTION_LOCK:
-            curr = self.collection.find_one({"_id": chat_id})
-            if curr:
+            if curr := self.collection.find_one({"_id": chat_id}):
                 return curr["warn_mode"]
 
             self.collection.insert_one(
@@ -136,8 +138,7 @@ class WarnSettings:
 
     def set_warnlimit(self, chat_id: int, warn_limit: int = 3):
         with INSERTION_LOCK:
-            curr = self.collection.find_one({"_id": chat_id})
-            if curr:
+            if curr := self.collection.find_one({"_id": chat_id}):
                 self.collection.update(
                     {"_id": chat_id},
                     {"warn_limit": warn_limit},
@@ -152,8 +153,7 @@ class WarnSettings:
 
     def get_warnlimit(self, chat_id: int):
         with INSERTION_LOCK:
-            curr = self.collection.find_one({"_id": chat_id})
-            if curr:
+            if curr := self.collection.find_one({"_id": chat_id}):
                 return curr["warn_limit"]
 
             self.collection.insert_one(

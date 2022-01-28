@@ -46,10 +46,9 @@ class Approve:
             if user_id in {i[0] for i in users}:
                 return True
 
-            curr_approve = self.collection.find_one(
+            if curr_approve := self.collection.find_one(
                 {"_id": chat_id},
-            )
-            if curr_approve:
+            ):
                 try:
                     return next(
                         user for user in curr_approve["users"] if user[0] == user_id
@@ -75,8 +74,7 @@ class Approve:
             users_old.add((user_id, user_name))
             APPROVE_CACHE[chat_id] = users_old
 
-            curr = self.collection.find_one({"_id": chat_id})
-            if curr:
+            if curr := self.collection.find_one({"_id": chat_id}):
                 users_old = curr["users"]
                 users_old.append((user_id, user_name))
                 users = list(set(users_old))  # Remove duplicates
@@ -111,8 +109,7 @@ class Approve:
             except StopIteration:
                 pass
 
-            curr = self.collection.find_one({"_id": chat_id})
-            if curr:
+            if curr := self.collection.find_one({"_id": chat_id}):
                 users = curr["users"]
                 try:
                     user = next(user for user in users if user[0] == user_id)
@@ -151,8 +148,7 @@ class Approve:
             except KeyError:
                 pass
             except Exception as ef:
-                curr = self.collection.find_one({"_id": chat_id})
-                if curr:
+                if curr := self.collection.find_one({"_id": chat_id}):
                     return curr["users"]
                 LOGGER.error(ef)
                 LOGGER.error(format_exc())
@@ -166,8 +162,7 @@ class Approve:
                 pass
             except Exception as ef:
                 num = 0
-                curr = self.collection.find_all()
-                if curr:
+                if curr := self.collection.find_all():
                     for chat in curr:
                         users = chat["users"]
                         num += len(users)
@@ -192,8 +187,7 @@ class Approve:
             except KeyError:
                 pass
             except Exception as ef:
-                all_app = self.collection.find_one({"_id": chat_id})
-                if all_app:
+                if all_app := self.collection.find_one({"_id": chat_id}):
                     return len(all_app["users"]) or 0
                 LOGGER.error(ef)
                 LOGGER.error(format_exc())
@@ -215,8 +209,7 @@ class Approve:
             except KeyError:
                 pass
 
-            old_chat_db = self.collection.find_one({"_id": old_chat_id})
-            if old_chat_db:
+            if old_chat_db := self.collection.find_one({"_id": old_chat_id}):
                 new_data = old_chat_db.update({"_id": new_chat_id})
                 self.collection.delete_one({"_id": old_chat_id})
                 self.collection.insert_one(new_data)
