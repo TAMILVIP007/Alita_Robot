@@ -100,7 +100,7 @@ class Filters:
                 LOGGER.error(format_exc())
 
             curr = self.collection.find_one(
-                {"chat_id": chat_id, "keyword": {"$regex": fr"\|?{keyword}\|?"}},
+                {"chat_id": chat_id, "keyword": {"$regex": rf"\|?{keyword}\|?"}},
             )
             if curr:
                 return curr
@@ -141,7 +141,7 @@ class Filters:
                 LOGGER.error(format_exc())
 
             curr = self.collection.find_one(
-                {"chat_id": chat_id, "keyword": {"$regex": fr"\|?{keyword}\|?"}},
+                {"chat_id": chat_id, "keyword": {"$regex": rf"\|?{keyword}\|?"}},
             )
             if curr:
                 self.collection.delete_one(curr)
